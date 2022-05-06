@@ -1,15 +1,13 @@
 
 #include "doctest.h"
 #include "stock_file_reader.h"
-#include <filesystem>
 #include <iostream>
-
-namespace fs = std::filesystem;
 
 TEST_CASE("read file")
 {
     using namespace std::literals::string_literals;
     auto resources_dir = "C://Users//Jeppe//Documents//SP//Stocks//resources//"s;
+    auto sample_dir = "C://Users//Jeppe//Downloads//SPexam_sample_input_data//json-2y//"s;
 
     SUBCASE("open file")
     {
@@ -100,5 +98,15 @@ TEST_CASE("read file")
                                                     7,
                                                     8}}});
     }
+
+    /*SUBCASE("read sample")
+    {
+        stock_file_reader_t fr(sample_dir + "DSV.json");
+
+        auto stock = fr.read_trades(1000, 30000);
+
+        std::cout << stock << std::endl;
+    }*/
+
 }
 
