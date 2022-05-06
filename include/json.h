@@ -8,12 +8,18 @@
 char peek(std::istream& is);
 char read(std::istream& is);
 void expect(std::istream& is, const char symbol);
+void read_until(std::istream& is, const char symbol);
 
 template <typename T>
 struct json_t
 {
     T&& data;
+    int& amount;
+    int& offset;
 };
+
+template <typename T>
+json_t(T&&, int, int) -> json_t<T>;
 
 template <typename T>
 json_t(T&&) -> json_t<T>;
@@ -21,7 +27,10 @@ json_t(T&&) -> json_t<T>;
 struct json_writer_t
 {
     std::istream& is;
+    int& amount;
+    int& offset;
     bool first = true;
+
     template <typename Data>
     void operator()(const std::string& name, Data& value)
     {
@@ -38,7 +47,7 @@ struct json_writer_t
         if (name_read != name)
             throw std::logic_error("Expected field \""s + name + "\" but got " + name_read);
         expect(is, ':');
-        is >> json_t{value};
+        is >> json_t{value, amount, offset};
     }
     /** handle tag-dispatch for tuples: */
     template <typename Tuple, std::size_t... Is>
@@ -103,6 +112,11 @@ std::istream& operator>>(std::istream& is, json_t<T>&& json)
         expect(is, '[');
         auto first = true;
         while (is){
+            if (json.amount == 0){
+                read_until(is, ']');
+                break;
+            }
+
             auto c = peek(is);
             if (c == ']'){
                 is.get();
@@ -115,17 +129,24 @@ std::istream& operator>>(std::istream& is, json_t<T>&& json)
             } else
                 first = false;
             U value{};
-            is >> json_t{value};
-            json.data.push_back(std::move(value));
+            is >> json_t{value, json.amount, json.offset};
+
+            if (json.offset <= 0) {
+                json.data.push_back(std::move(value));
+                if (json.amount > 0)
+                    json.amount--;
+            }
+            else
+                json.offset--;
         }
     }
     else if constexpr (is_tuple_v<T>) {
         expect(is, '{');
-        json_writer_t{is}(json.data);
+        json_writer_t{is, json.amount, json.offset}(json.data);
         expect(is, '}');
     } else if constexpr (accepts_writer_v<T, json_reader_t>) {
         expect(is, '{');
-        json.data.accept_writer(json_writer_t{is});
+        json.data.accept_writer(json_writer_t{is, json.amount, json.offset});
         expect(is, '}');
     }
 
@@ -153,18 +174,10 @@ char read(std::istream& is){
     return c;
 }
 
-class json_value_t{
-
-};
-
-// Nested datastructure for JSON data
-class json_data_t
-{
-    std::string key;
-    json_value_t value;
-
-public:
-    json_data_t(){}
-};
+void read_until(std::istream& is, const char symbol){
+    char c;
+    while (is.get(c) && c != symbol)
+        ;
+}
 
 #endif //STOCKS_JSON_H
