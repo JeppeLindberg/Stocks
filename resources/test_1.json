@@ -1,0 +1,31 @@
+{
+  "tag": "BAVA",
+  "isin": "DK0015998017",
+  "shares": 70472935,
+  "name": "Bavarian Nordic A/S",
+  "url": "https://www.bavarian-nordic.com/",
+  "market": "Nasdaq Copenhagen",
+  "sector": "Health Care",
+  "segment": "Large",
+  "trades":
+  [
+    {
+      "time": "2012-10-31T09:00:01.000+0100",
+      "price": 53,
+      "amount": 422,
+      "buyer": "NA",
+      "seller": "NA",
+      "seq": 1,
+      "code": 0
+    },
+    {
+      "time": "2012-10-31T09:01:07.000+0100",
+      "price": 52.5,
+      "amount": 2,
+      "buyer": "NA",
+      "seller": "NA",
+      "seq": 2,
+      "code": 0
+    }
+  ]
+}
