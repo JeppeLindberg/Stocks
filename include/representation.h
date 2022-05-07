@@ -86,6 +86,11 @@ public:
 
     representation_candle_t(const std::string& file_path): sfr{file_path}, intervals(), pages_fetched()
     {}
+
+    representation_candle_t(const std::string& file_path, int page_size): sfr{file_path}, intervals(), pages_fetched()
+    {
+        sfr.page_size = page_size;
+    }
 };
 
 #endif //STOCKS_REPRESENTATIONS_H

@@ -11,8 +11,9 @@ TEST_CASE("representations")
 
     SUBCASE("candle")
     {
-        representation_candle_t rc(resources_dir + "test_2.json");
+        representation_candle_t rc(resources_dir + "test_2.json", 3);
 
+        rc.get_data();
         rc.get_data();
 
 
