@@ -10,6 +10,7 @@ char read(std::istream& is);
 void expect(std::istream& is, const char symbol);
 void read_until(std::istream& is, const char symbol);
 
+// Requirement 1
 template <typename T>
 struct json_t
 {

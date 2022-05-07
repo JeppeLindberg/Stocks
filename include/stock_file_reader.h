@@ -172,6 +172,7 @@ std::ostream& operator<<(std::ostream& os, const std::set<trade_t>& trades) {
     return os << "]";
 }
 
+// Requirement 2
 class stock_file_reader_t{
     std::ifstream ifs;
     bool first_read = true;

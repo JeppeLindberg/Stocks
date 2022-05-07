@@ -45,7 +45,7 @@ std::ostream& operator<<(std::ostream& os, const std::tm& time) {
 }
 
 struct utility_t{
-    static std::tm modulo_tm(std::tm time, int mod){
+    static std::tm tm_to_key(std::tm time, int mod){
         time.tm_sec = 0;
         time.tm_min = 0;
         time.tm_hour = (time.tm_hour / mod) * mod;

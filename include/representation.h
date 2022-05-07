@@ -34,6 +34,7 @@ struct interval_t{
     }
 };
 
+// Requirement 3
 class representation_candle_t{
     stock_file_reader_t sfr;
     std::map<std::tm, interval_t> intervals;
@@ -56,20 +57,20 @@ public:
         bool first_loop = true;
         interval_t new_interval{};
         std::tm first_key{};
-        std::tm old_key{};
+        std::tm prev_key{};
 
         for(const trade_t& trade : stock.trades){
+            std::tm new_key = utility_t::tm_to_key(trade.time, hpc);
             if (first_loop) {
-                first_key = utility_t::modulo_tm(trade.time, hpc);
+                first_key = new_key;
                 first_loop = false;
             }
-            std::tm new_key = utility_t::modulo_tm(trade.time, hpc);
             if (first_key != new_key)
             {
-                if (!new_interval.trades.empty() && new_key != old_key && !intervals.contains(old_key))
+                if (!new_interval.trades.empty() && new_key != prev_key && !intervals.contains(prev_key))
                 {
                     new_interval.generate_values();
-                    intervals[old_key] = new_interval;
+                    intervals[prev_key] = new_interval;
                     new_interval = interval_t{};
                 }
                 if (!intervals.contains(new_key))
@@ -79,7 +80,7 @@ public:
                     }
                 }
             }
-            old_key = new_key;
+            prev_key = new_key;
         }
     }
 
