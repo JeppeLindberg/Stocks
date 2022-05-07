@@ -143,11 +143,6 @@ std::ostream& operator<<(std::ostream& os, const std::vector<trade_json_t>& trad
     return os << "]";
 }
 
-std::ostream& operator<<(std::ostream& os, const std::tm& time) {
-    return os << time.tm_year << "-" << time.tm_mon << "-" << time.tm_mday <<
-                 "T" << time.tm_hour << ":" << time.tm_min << ":" << time.tm_sec;
-}
-
 class stock_file_reader_t{
     std::ifstream ifs;
 

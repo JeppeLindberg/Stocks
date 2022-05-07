@@ -16,4 +16,9 @@ bool operator==(const std::tm& t1, const std::tm& t2)
            (t1.tm_yday == t2.tm_yday);
 }
 
+std::ostream& operator<<(std::ostream& os, const std::tm& time) {
+    return os << time.tm_year << "-" << time.tm_mon << "-" << time.tm_mday <<
+              "T" << time.tm_hour << ":" << time.tm_min << ":" << time.tm_sec;
+}
+
 #endif //STOCKS_UTILITY_H
