@@ -76,4 +76,5 @@ constexpr auto accepts_writer_v = accepts_writer<Data, Writer>::value;
 
 
 
+
 #endif //STOCKS_TYPES_H

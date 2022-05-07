@@ -4,15 +4,25 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <ctime>
 #include "json.h"
+#include "utility.h"
 
-struct trade_json_t;
+class trade_json_t;
 std::ostream& operator<<(std::ostream& os, const std::vector<trade_json_t>& trades);
 std::ostream& operator<<(std::ostream& os, const trade_json_t& trade);
+std::ostream& operator<<(std::ostream& os, const std::tm& time);
 
-struct trade_json_t
+class trade_json_t
 {
-    std::string time;
+private:
+    void set_time(std::string& time_str){
+        std::istringstream ss(time_str);
+        ss >> std::get_time(&time, "%Y-%m-%dT%H:%M:%S.000+0100");
+    }
+
+public:
+    std::tm time;
     double price;
     int amount;
     std::string buyer;
@@ -23,13 +33,17 @@ struct trade_json_t
     template <typename Visitor>
     void accept_writer(Visitor&& visit)
     {
-        visit("time", time);
+        std::string time_str;
+
+        visit("time", time_str);
         visit("price", price);
         visit("amount", amount);
         visit("buyer", buyer);
         visit("seller", seller);
         visit("seq", seq);
         visit("code", code);
+
+        set_time(time_str);
     }
 
     friend bool operator==(const trade_json_t& t1, const trade_json_t& t2)
@@ -41,6 +55,25 @@ struct trade_json_t
                (t1.seller == t2.seller) &&
                (t1.seq == t2.seq) &&
                (t1.code == t2.code);
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const trade_json_t& trade) {
+        return os << "{ \"time\": \"" << trade.time << "\", " <<
+                  "\"price\": " << trade.price << ", " <<
+                  "\"amount\": " << trade.amount << ", " <<
+                  "\"buyer\": \"" << trade.buyer << "\", " <<
+                  "\"seller\": \"" << trade.seller << "\", " <<
+                  "\"seq\": " << trade.seq << ", " <<
+                  "\"code\": " << trade.code << "} ";
+    }
+
+    trade_json_t():time(), price(), amount(), buyer(), seller(),seq(), code(){}
+
+    trade_json_t(std::string _time, double _price, int _amount,
+                 std::string _buyer, std::string _seller, int _seq, int _code):
+            time(), price(_price), amount(_amount), buyer(_buyer), seller(_seller),
+            seq(_seq), code(_code){
+        set_time(_time);
     }
 };
 
@@ -110,14 +143,9 @@ std::ostream& operator<<(std::ostream& os, const std::vector<trade_json_t>& trad
     return os << "]";
 }
 
-std::ostream& operator<<(std::ostream& os, const trade_json_t& trade) {
-    return os << "{ \"time\": \"" << trade.time << "\", " <<
-              "\"price\": " << trade.price << ", " <<
-              "\"amount\": " << trade.amount << ", " <<
-              "\"buyer\": \"" << trade.buyer << "\", " <<
-              "\"seller\": \"" << trade.seller << "\", " <<
-              "\"seq\": " << trade.seq << ", " <<
-              "\"code\": " << trade.code << "} ";
+std::ostream& operator<<(std::ostream& os, const std::tm& time) {
+    return os << time.tm_year << "-" << time.tm_mon << "-" << time.tm_mday <<
+                 "T" << time.tm_hour << ":" << time.tm_min << ":" << time.tm_sec;
 }
 
 class stock_file_reader_t{
