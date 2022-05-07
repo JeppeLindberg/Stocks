@@ -1,0 +1,58 @@
+{
+  "tag": "data1",
+  "isin": "data2",
+  "shares": 20,
+  "name": "data3",
+  "url": "data4",
+  "market": "data5",
+  "sector": "data6",
+  "segment": "data7",
+  "trades":
+  [
+    {
+      "time": "2012-10-09T09:00:01.000+0100",
+      "price": 1,
+      "amount": 2,
+      "buyer": "trade1_1",
+      "seller": "trade1_2",
+      "seq": 3,
+      "code": 4
+    },
+    {
+      "time": "2012-10-10T09:00:01.000+0100",
+      "price": 1,
+      "amount": 2,
+      "buyer": "trade2_1",
+      "seller": "trade2_2",
+      "seq": 3,
+      "code": 4
+    },
+    {
+      "time": "2012-10-10T09:01:07.000+0100",
+      "price": 5.5,
+      "amount": 6,
+      "buyer": "trade3_1",
+      "seller": "trade3_2",
+      "seq": 7,
+      "code": 8
+    },
+    {
+      "time": "2012-10-10T09:00:01.000+0100",
+      "price": 1,
+      "amount": 2,
+      "buyer": "trade4_1",
+      "seller": "trade4_2",
+      "seq": 3,
+      "code": 4
+    },
+    {
+      "time": "2012-10-11T09:01:07.000+0100",
+      "price": 5.5,
+      "amount": 6,
+      "buyer": "trade5_1",
+      "seller": "trade5_2",
+      "seq": 7,
+      "code": 8
+    }
+  ]
+}

@@ -132,7 +132,7 @@ std::istream& operator>>(std::istream& is, json_t<T>&& json)
             is >> json_t{value, json.amount, json.offset};
 
             if (json.offset <= 0) {
-                json.data.push_back(std::move(value));
+                json.data.insert(std::move(value));
                 if (json.amount > 0)
                     json.amount--;
             }

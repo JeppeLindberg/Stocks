@@ -3,17 +3,16 @@
 
 #include <iostream>
 #include <fstream>
-#include <vector>
 #include <ctime>
+#include <set>
 #include "json.h"
 #include "utility.h"
 
-class trade_json_t;
-std::ostream& operator<<(std::ostream& os, const std::vector<trade_json_t>& trades);
-std::ostream& operator<<(std::ostream& os, const trade_json_t& trade);
-std::ostream& operator<<(std::ostream& os, const std::tm& time);
+class trade_t;
+std::ostream& operator<<(std::ostream& os, const std::set<trade_t>& trades);
+std::ostream& operator<<(std::ostream& os, const trade_t& trade);
 
-class trade_json_t
+class trade_t
 {
 private:
     void set_time(std::string& time_str){
@@ -46,7 +45,7 @@ public:
         set_time(time_str);
     }
 
-    friend bool operator==(const trade_json_t& t1, const trade_json_t& t2)
+    friend bool operator==(const trade_t& t1, const trade_t& t2)
     {
         return (t1.time == t2.time) &&
                (t1.price == t2.price) &&
@@ -57,7 +56,26 @@ public:
                (t1.code == t2.code);
     }
 
-    friend std::ostream& operator<<(std::ostream& os, const trade_json_t& trade) {
+    friend bool operator<(const trade_t& t1, const trade_t& t2)
+    {
+        if (t1.time != t2.time)
+            return (t1.time < t2.time);
+        if (t1.price != t2.price)
+            return (t1.price < t2.price);
+        if (t1.amount != t2.amount)
+            return (t1.amount < t2.amount);
+        if (t1.buyer != t2.buyer)
+            return (t1.buyer < t2.buyer);
+        if (t1.seller != t2.seller)
+            return (t1.seller < t2.seller);
+        if (t1.seq != t2.seq)
+            return (t1.seq < t2.seq);
+        if (t1.code != t2.code)
+            return (t1.code < t2.code);
+        return false;
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const trade_t& trade) {
         return os << "{ \"time\": \"" << trade.time << "\", " <<
                   "\"price\": " << trade.price << ", " <<
                   "\"amount\": " << trade.amount << ", " <<
@@ -67,10 +85,10 @@ public:
                   "\"code\": " << trade.code << "} ";
     }
 
-    trade_json_t():time(), price(), amount(), buyer(), seller(),seq(), code(){}
+    trade_t(): time(), price(), amount(), buyer(), seller(), seq(), code(){}
 
-    trade_json_t(std::string _time, double _price, int _amount,
-                 std::string _buyer, std::string _seller, int _seq, int _code):
+    trade_t(std::string _time, double _price, int _amount,
+            std::string _buyer, std::string _seller, int _seq, int _code):
             time(), price(_price), amount(_amount), buyer(_buyer), seller(_seller),
             seq(_seq), code(_code){
         set_time(_time);
@@ -78,7 +96,7 @@ public:
 };
 
 // Nested datastructure for JSON data
-struct stock_json_t
+struct stock_t
 {
     std::string tag;
     std::string isin;
@@ -88,7 +106,18 @@ struct stock_json_t
     std::string market;
     std::string sector;
     std::string segment;
-    std::vector<trade_json_t> trades;
+    std::set<trade_t> trades;
+
+    void extend(stock_t& other_stock) {
+        using namespace std::literals::string_literals;
+
+        if (tag != other_stock.tag)
+            throw std::logic_error("Attempting to extend stock "s + tag + " with stock " + other_stock.tag);
+
+        for(const trade_t& trade: other_stock.trades){
+            trades.insert(trade);
+        }
+    }
 
     template <typename Visitor>
     void accept_writer(Visitor&& visit)
@@ -104,7 +133,7 @@ struct stock_json_t
         visit("trades", trades);
     }
 
-    friend bool operator==(const stock_json_t& s1, const stock_json_t& s2)
+    friend bool operator==(const stock_t& s1, const stock_t& s2)
     {
         return (s1.tag == s2.tag) &&
                 (s1.isin == s2.isin) &&
@@ -118,7 +147,7 @@ struct stock_json_t
     }
 };
 
-std::ostream& operator<<(std::ostream& os, const stock_json_t& stock) {
+std::ostream& operator<<(std::ostream& os, const stock_t& stock) {
     return os << "{ \"tag\": \"" << stock.tag << "\", " <<
               "\"isin\": \"" << stock.isin << "\", " <<
               "\"shares\": " << stock.shares << ", " <<
@@ -130,10 +159,10 @@ std::ostream& operator<<(std::ostream& os, const stock_json_t& stock) {
               "\"trades\": " << stock.trades << "}";
 }
 
-std::ostream& operator<<(std::ostream& os, const std::vector<trade_json_t>& trades) {
+std::ostream& operator<<(std::ostream& os, const std::set<trade_t>& trades) {
     os << "[";
     auto first = true;
-    for (const trade_json_t& trade : trades) {
+    for (const trade_t& trade : trades) {
         if (!first)
             os << ",";
         else
@@ -145,18 +174,42 @@ std::ostream& operator<<(std::ostream& os, const std::vector<trade_json_t>& trad
 
 class stock_file_reader_t{
     std::ifstream ifs;
+    bool first_read = true;
+    stock_t sj;
+    std::string path;
 
-public:
-    stock_json_t read_trades(int amount, int offset){
-        stock_json_t jd;
-
-        ifs >> json_t{jd, amount, offset};
-
-        return jd;
+    stock_t read_trades(int amount, int offset){
+        ifs = std::ifstream(path, std::ifstream::in);
+        if (first_read){
+            sj = stock_t{};
+            ifs >> json_t{sj, amount, offset};
+            first_read = false;
+        }
+        else
+        {
+            stock_t new_sj{};
+            ifs >> json_t{new_sj, amount, offset};
+            sj.extend(new_sj);
+        }
+        ifs.close();
+        return sj;
     }
 
-    stock_file_reader_t(const std::string& path){
-        ifs = std::ifstream(path, std::ifstream::in);
+public:
+    int page_size = 5000;
+
+    stock_t read_page(int page){
+        return read_trades(page_size, page * page_size);
+    }
+
+    stock_t read_first_trade(){
+        return read_trades(1, 0);
+    }
+
+    stock_file_reader_t(const std::string& file_path){
+        path = file_path;
+        sj = stock_t{};
+        first_read = true;
     }
     ~stock_file_reader_t(){
         ifs.close();
