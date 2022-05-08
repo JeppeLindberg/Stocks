@@ -2,6 +2,7 @@
 #define STOCKS_TYPES_H
 
 #include <type_traits>
+#include <span>
 
 //is_same_v: Returns value true if bool and T is the same, otherwise false
 //remove_cv_t: Returns type of T where any const or volatile is removed

@@ -40,14 +40,14 @@ class representation_candle_t{
     std::map<std::tm, interval_t> intervals;
     std::vector<int> pages_fetched;
 
-    bool contains_interval(std::tm start, std::tm end){
+    bool contains_interval(const std::tm& start, const std::tm& end){
         bool contains_lower = false;
         bool contains_higher = false;
 
         for(std::pair<std::tm, interval_t> pair : intervals){
-            if(!contains_lower && pair.first < start)
+            if(!contains_lower && pair.first <= start)
                 contains_lower = true;
-            if(!contains_higher && end < pair.first)
+            if(!contains_higher && end <= pair.first)
                 contains_higher = true;
             if(contains_lower && contains_higher)
                 return true;
@@ -55,7 +55,7 @@ class representation_candle_t{
         return false;
     }
 
-    std::vector<interval_t> get_interval(std::tm start, std::tm end){
+    std::vector<interval_t> get_interval(const std::tm& start, const std::tm& end){
         using namespace std::literals::string_literals;
 
         if (!contains_interval(start, end))
@@ -65,9 +65,9 @@ class representation_candle_t{
         std::tm higher_key = utility_t::max_tm;
 
         for(std::pair<std::tm, interval_t> pair : intervals){
-            if(pair.first < start && lower_key < pair.first)
+            if(pair.first <= start && lower_key < pair.first)
                 lower_key = pair.first;
-            if(end < pair.first && pair.first < higher_key)
+            if(end <= pair.first && pair.first < higher_key)
                 higher_key = pair.first;
         }
 
@@ -77,7 +77,7 @@ class representation_candle_t{
         while(key != higher_key){
             if (intervals.contains(key))
                 itv.push_back(intervals[key]);
-            key = utility_t::tm_next_key(key, hpc);
+            key = utility_t::tm_move_key(key, hpc, 1);
         }
 
         return itv;
@@ -131,7 +131,7 @@ public:
     int hpc = 24; // Hours per candle
     stock_t stock;
 
-    std::vector<interval_t> get_period(std::tm start, std::tm end){
+    std::vector<interval_t> get_period(const std::tm& start, const std::tm& end){
         std::tm start_key = utility_t::tm_to_key(start, hpc);
         std::tm end_key = utility_t::tm_to_key(end, hpc);
 
