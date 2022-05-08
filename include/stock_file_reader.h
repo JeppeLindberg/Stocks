@@ -8,19 +8,12 @@
 #include "json.h"
 #include "utility.h"
 
-class trade_t;
+struct trade_t;
 std::ostream& operator<<(std::ostream& os, const std::set<trade_t>& trades);
 std::ostream& operator<<(std::ostream& os, const trade_t& trade);
 
-class trade_t
+struct trade_t
 {
-private:
-    void set_time(std::string& time_str){
-        std::istringstream ss(time_str);
-        ss >> std::get_time(&time, "%Y-%m-%dT%H:%M:%S.000+0100");
-    }
-
-public:
     std::tm time;
     double price;
     int amount;
@@ -42,7 +35,7 @@ public:
         visit("seq", seq);
         visit("code", code);
 
-        set_time(time_str);
+        utility_t::set_time(time_str, time);
     }
 
     friend bool operator==(const trade_t& t1, const trade_t& t2)
@@ -91,7 +84,7 @@ public:
             std::string _buyer, std::string _seller, int _seq, int _code):
             time(), price(_price), amount(_amount), buyer(_buyer), seller(_seller),
             seq(_seq), code(_code){
-        set_time(_time);
+        utility_t::set_time(_time, time);
     }
 };
 

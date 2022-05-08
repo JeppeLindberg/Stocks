@@ -9,13 +9,16 @@ TEST_CASE("representations")
     auto resources_dir = "C://Users//Jeppe//Documents//SP//Stocks//resources//"s;
     auto sample_dir = "C://Users//Jeppe//Downloads//SPexam_sample_input_data//json-2y//"s;
 
-    SUBCASE("candle")
+    SUBCASE("candle read period")
     {
-        representation_candle_t rc(resources_dir + "test_2.json", 3);
+        using namespace std::literals::string_literals;
+        representation_candle_t rc(sample_dir + "BAVA.json");
 
-        rc.get_data();
-        rc.get_data();
+        std::tm start{};
+        std::tm end{};
+        utility_t::set_time("2012-08-02T01:00:00.000+0200"s, start);
+        utility_t::set_time("2012-08-06T01:00:00.000+0200"s, end);
 
-
+        auto period = rc.get_period(start, end);
     }
 }

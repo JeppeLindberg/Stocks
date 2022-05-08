@@ -1,6 +1,8 @@
 #ifndef STOCKS_UTILITY_H
 #define STOCKS_UTILITY_H
 
+#include <iostream>
+#include <fstream>
 #include <ctime>
 
 bool operator==(const std::tm& t1, const std::tm& t2)
@@ -45,11 +47,28 @@ std::ostream& operator<<(std::ostream& os, const std::tm& time) {
 }
 
 struct utility_t{
-    static std::tm tm_to_key(std::tm time, int mod){
+    constexpr static std::tm min_tm{0,0,0,0,0,0,0,0,0};
+    constexpr static std::tm max_tm{0,0,0,0,0,999,0,0,0};
+
+    static std::tm tm_to_key(std::tm time, int hpc){
         time.tm_sec = 0;
         time.tm_min = 0;
-        time.tm_hour = (time.tm_hour / mod) * mod;
+        time.tm_hour = (time.tm_hour / hpc) * hpc;
+        std::mktime(&time);
         return time;
+    }
+
+    static std::tm tm_next_key(std::tm time, int hpc){
+        time.tm_sec = 0;
+        time.tm_min = 0;
+        time.tm_hour += hpc;
+        std::mktime(&time);
+        return time;
+    }
+
+    static void set_time(const std::string& time_str, std::tm& time){
+        std::istringstream ss(time_str);
+        ss >> std::get_time(&time, "%Y-%m-%dT%H:%M:%S.000+0100");
     }
 };
 

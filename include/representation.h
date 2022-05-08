@@ -40,11 +40,50 @@ class representation_candle_t{
     std::map<std::tm, interval_t> intervals;
     std::vector<int> pages_fetched;
 
-public:
-    int hpc = 24; // Hours per candle
-    stock_t stock;
+    bool contains_interval(std::tm start, std::tm end){
+        bool contains_lower = false;
+        bool contains_higher = false;
 
-    void get_data(){
+        for(std::pair<std::tm, interval_t> pair : intervals){
+            if(!contains_lower && pair.first < start)
+                contains_lower = true;
+            if(!contains_higher && end < pair.first)
+                contains_higher = true;
+            if(contains_lower && contains_higher)
+                return true;
+        }
+        return false;
+    }
+
+    std::vector<interval_t> get_interval(std::tm start, std::tm end){
+        using namespace std::literals::string_literals;
+
+        if (!contains_interval(start, end))
+            throw std::logic_error("Period not in range"s);
+
+        std::tm lower_key = utility_t::min_tm;
+        std::tm higher_key = utility_t::max_tm;
+
+        for(std::pair<std::tm, interval_t> pair : intervals){
+            if(pair.first < start && lower_key < pair.first)
+                lower_key = pair.first;
+            if(end < pair.first && pair.first < higher_key)
+                higher_key = pair.first;
+        }
+
+        std::tm key = lower_key;
+        std::vector<interval_t> itv{};
+
+        while(key != higher_key){
+            if (intervals.contains(key))
+                itv.push_back(intervals[key]);
+            key = utility_t::tm_next_key(key, hpc);
+        }
+
+        return itv;
+    }
+
+    bool get_data(){
         int last_page = -1;
         for (int x : pages_fetched)
             if(x > last_page)
@@ -55,6 +94,7 @@ public:
         pages_fetched.push_back(target_page);
 
         bool first_loop = true;
+        bool new_intervals = false;
         interval_t new_interval{};
         std::tm first_key{};
         std::tm prev_key{};
@@ -71,6 +111,7 @@ public:
                 {
                     new_interval.generate_values();
                     intervals[prev_key] = new_interval;
+                    new_intervals = true;
                     new_interval = interval_t{};
                 }
                 if (!intervals.contains(new_key))
@@ -82,6 +123,22 @@ public:
             }
             prev_key = new_key;
         }
+
+        return new_intervals;
+    }
+
+public:
+    int hpc = 24; // Hours per candle
+    stock_t stock;
+
+    std::vector<interval_t> get_period(std::tm start, std::tm end){
+        std::tm start_key = utility_t::tm_to_key(start, hpc);
+        std::tm end_key = utility_t::tm_to_key(end, hpc);
+
+        while (!contains_interval(start_key, end_key) && get_data())
+            ;
+
+        return get_interval(start_key, end_key);
     }
 
     representation_candle_t(const std::string& file_path): sfr{file_path}, intervals(), pages_fetched()
