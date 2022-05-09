@@ -71,7 +71,7 @@ class representation_candle_t{
                 higher_key = pair.first;
         }
 
-        return slice(intervals, lower_key, higher_key, hpc);
+        return slice(intervals, lower_key, higher_key);
     }
 
     bool get_data(){
@@ -91,7 +91,7 @@ class representation_candle_t{
         std::tm prev_key{};
 
         for(const trade_t& trade : stock.trades){
-            std::tm new_key = utility_t::tm_to_key(trade.time, hpc);
+            std::tm new_key = utility_t::tm_to_key(trade.time);
             if (first_loop) {
                 first_key = new_key;
                 first_loop = false;
@@ -119,12 +119,11 @@ class representation_candle_t{
     }
 
 public:
-    int hpc = 24; // Hours per candle
     stock_t stock;
 
     std::map<std::tm, interval_t> get_period(const std::tm& start, const std::tm& end){
-        std::tm start_key = utility_t::tm_to_key(start, hpc);
-        std::tm end_key = utility_t::tm_to_key(end, hpc);
+        std::tm start_key = utility_t::tm_to_key(start);
+        std::tm end_key = utility_t::tm_to_key(end);
 
         while (!contains_interval(start_key, end_key) && get_data())
             ;

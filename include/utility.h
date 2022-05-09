@@ -73,8 +73,9 @@ std::ostream& operator<<(std::ostream& os, const std::tm& time) {
 struct utility_t{
     constexpr static std::tm min_tm{0,0,0,0,0,0,0,0,0};
     constexpr static std::tm max_tm{0,0,0,0,0,999,0,0,0};
+    constexpr static int hpc = 24; // Hours per candle
 
-    static std::tm tm_to_key(std::tm time, int hpc){
+    static std::tm tm_to_key(std::tm time){
         time.tm_sec = 0;
         time.tm_min = 0;
         time.tm_hour = (time.tm_hour / hpc) * hpc;
@@ -82,7 +83,7 @@ struct utility_t{
         return time;
     }
 
-    static std::tm tm_move_key(std::tm time, int hpc, int move){
+    static std::tm tm_move_key(std::tm time, int move){
         time.tm_sec = 0;
         time.tm_min = 0;
         time.tm_hour += hpc * move;
@@ -103,15 +104,17 @@ constexpr auto slice(T&& container, int from, int to)
 }
 
 template<typename T>
-constexpr std::map<std::tm, T> slice(std::map<std::tm, T>& map, std::tm from, std::tm to, int hpc)
+constexpr std::map<std::tm, T> slice(std::map<std::tm, T>& map, std::tm from, std::tm to)
 {
+    // Possible point of optimization: Prevent the slice from being copies, and instead make them references
+
     std::tm key = from;
     std::map<std::tm, T> ret_map;
 
     while(key < to){
         if (map.contains(key))
             ret_map[key] = map[key];
-        key = utility_t::tm_move_key(key, hpc, 1);
+        key = utility_t::tm_move_key(key, 1);
     }
 
     return ret_map;
