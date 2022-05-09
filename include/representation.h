@@ -55,7 +55,7 @@ class representation_candle_t{
         return false;
     }
 
-    std::vector<interval_t> get_interval(const std::tm& start, const std::tm& end){
+    std::map<std::tm, interval_t> get_interval(const std::tm& start, const std::tm& end){
         using namespace std::literals::string_literals;
 
         if (!contains_interval(start, end))
@@ -71,16 +71,7 @@ class representation_candle_t{
                 higher_key = pair.first;
         }
 
-        std::tm key = lower_key;
-        std::vector<interval_t> itv{};
-
-        while(key != higher_key){
-            if (intervals.contains(key))
-                itv.push_back(intervals[key]);
-            key = utility_t::tm_move_key(key, hpc, 1);
-        }
-
-        return itv;
+        return slice(intervals, lower_key, higher_key, hpc);
     }
 
     bool get_data(){
@@ -131,7 +122,7 @@ public:
     int hpc = 24; // Hours per candle
     stock_t stock;
 
-    std::vector<interval_t> get_period(const std::tm& start, const std::tm& end){
+    std::map<std::tm, interval_t> get_period(const std::tm& start, const std::tm& end){
         std::tm start_key = utility_t::tm_to_key(start, hpc);
         std::tm end_key = utility_t::tm_to_key(end, hpc);
 

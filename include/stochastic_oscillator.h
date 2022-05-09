@@ -5,51 +5,78 @@
 #include "utility.h"
 
 struct point_t{
-    double k;
-    double d;
+    double so; // K: The fast stochastic oscillator
+    double moving_avg; // D: The slow moving average over the last y values of K
 
-    double c;
-    double l;
-    double h;
+    double closing_price; // C
+    double lowest_overall; // L: The lowest overall price of the last x intervals
+    double highest_overall; // H: The highest overall price of the last x intervals
 };
 
 // Requirement 4
 class stochastic_oscillator_t{
+    representation_candle_t rc;
+
 public:
     int x = 14;
     int y = 3;
-    representation_candle_t rc;
-    std::vector<point_t> points;
+    std::map<std::tm, point_t> points;
 
-    std::vector<point_t> get_period(const std::tm& start, const std::tm& end){
-        std::vector<interval_t> intervals = rc.get_period(start, end);
-        points = std::vector<point_t>(intervals.size() - x);
+    std::map<std::tm, point_t> get_period(const std::tm& start, const std::tm& end){
+        std::map<std::tm, interval_t> intervals = rc.get_period(start, end);
 
+        int intervals_size = intervals.size();
         int i = 0;
-        for(point_t& point : points){
+        double last_c = 0;
+        for(std::pair<std::tm, interval_t> pair : intervals){
+            if (i > (intervals_size - x))
+                break;
+
+            std::tm key = utility_t::tm_move_key(pair.first, rc.hpc, x);
+            if (points.contains(key))
+                continue;
+
+            point_t point{};
             bool first_slice_loop = true;
-            for(const interval_t& interval : slice(intervals, i, i+x)){
+            // Finds the span of x intervals for calculating lowest_overall and highest_overall
+            auto slc = slice(intervals, utility_t::tm_move_key(key, rc.hpc, -x),
+                               key,
+                               rc.hpc);
+            for(std::pair<std::tm, interval_t> pair_prev : slc){
                 if(first_slice_loop){
-                    point.l = interval.min_price;
-                    point.h = interval.max_price;
+                    point.lowest_overall = pair_prev.second.min_price;
+                    point.highest_overall = pair_prev.second.max_price;
                     first_slice_loop = false;
                 }
                 else {
-                    if (interval.min_price < point.l)
-                        point.l = interval.min_price;
-                    if (point.h < interval.max_price)
-                        point.h = interval.max_price;
+                    if (pair_prev.second.min_price < point.lowest_overall)
+                        point.lowest_overall = pair_prev.second.min_price;
+                    if (point.highest_overall < pair_prev.second.max_price)
+                        point.highest_overall = pair_prev.second.max_price;
                 }
             }
-            point.c = (intervals.begin()+i+x-1)->last_price;
+            std::tm prev_key = utility_t::tm_move_key(key, rc.hpc, -1);
 
-            point.k = (point.c - point.l)/(point.h - point.l);
+            if (intervals.contains(prev_key)){
+                point.closing_price = intervals[prev_key].last_price;
+                last_c = point.closing_price;
+            }
+            else
+                point.closing_price = last_c;
 
+            point.so = (point.closing_price - point.lowest_overall) / (point.highest_overall - point.lowest_overall);
+
+            points[key] = point;
+
+            auto slc_2 = slice(points,
+                               utility_t::tm_move_key(key, rc.hpc, -y),
+                               utility_t::tm_move_key(key, rc.hpc, -1),
+                               rc.hpc);
             if(i >= y) {
-                for(const point_t& point_2 : slice(points, i-y, i-1)){
-                    point.d += point_2.k;
+                for(const std::pair<std::tm, point_t> prev_point : slc_2){
+                    point.moving_avg += prev_point.second.so;
                 }
-                point.d = point.d/y;
+                point.moving_avg = point.moving_avg / y;
             }
 
             i++;
@@ -58,7 +85,7 @@ public:
         return points;
     }
 
-    stochastic_oscillator_t(const std::string& file_path) : rc{file_path}
+    stochastic_oscillator_t(const std::string& file_path) : rc{file_path}, points()
     {}
 };
 

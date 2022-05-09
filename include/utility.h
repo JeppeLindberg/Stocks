@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <ctime>
+#include <map>
 
 bool operator==(const std::tm& t1, const std::tm& t2)
 {
@@ -69,12 +70,6 @@ std::ostream& operator<<(std::ostream& os, const std::tm& time) {
               "T" << time.tm_hour << ":" << time.tm_min << ":" << time.tm_sec;
 }
 
-template<typename T>
-constexpr auto slice(T&& container, int x, int y)
-{
-    return std::span(begin(std::forward<T>(container))+x, begin(std::forward<T>(container))+y);
-}
-
 struct utility_t{
     constexpr static std::tm min_tm{0,0,0,0,0,0,0,0,0};
     constexpr static std::tm max_tm{0,0,0,0,0,999,0,0,0};
@@ -100,5 +95,26 @@ struct utility_t{
         ss >> std::get_time(&time, "%Y-%m-%dT%H:%M:%S.000+0100");
     }
 };
+
+template<typename T>
+constexpr auto slice(T&& container, int from, int to)
+{
+    return std::span(begin(std::forward<T>(container))+from, begin(std::forward<T>(container))+to);
+}
+
+template<typename T>
+constexpr std::map<std::tm, T> slice(std::map<std::tm, T>& map, std::tm from, std::tm to, int hpc)
+{
+    std::tm key = from;
+    std::map<std::tm, T> ret_map;
+
+    while(key < to){
+        if (map.contains(key))
+            ret_map[key] = map[key];
+        key = utility_t::tm_move_key(key, hpc, 1);
+    }
+
+    return ret_map;
+}
 
 #endif //STOCKS_UTILITY_H
