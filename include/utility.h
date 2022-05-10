@@ -66,7 +66,7 @@ bool operator<=(const std::tm& t1, const std::tm& t2)
 }
 
 std::ostream& operator<<(std::ostream& os, const std::tm& time) {
-    return os << time.tm_year << "-" << time.tm_mon << "-" << time.tm_mday <<
+    return os << time.tm_year+1900 << "-" << time.tm_mon+1 << "-" << time.tm_mday <<
               "T" << time.tm_hour << ":" << time.tm_min << ":" << time.tm_sec;
 }
 

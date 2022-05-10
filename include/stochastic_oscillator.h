@@ -23,19 +23,20 @@ struct point_t{
 // Requirement 4
 class stochastic_oscillator_t{
     representation_candle_t rc;
-    std::map<std::tm, point_t> points;
 
 public:
+    std::map<std::tm, point_t> points;
     int x = 14;
     int y = 3;
 
-    std::map<std::tm, point_t>& get_period(const std::tm& start, const std::tm& end){
+    bool get_period(const std::tm& start, const std::tm& end){
         std::map<std::tm, interval_t> intervals = rc.get_period(start, end);
 
         int intervals_size = intervals.size();
         int i = 0;
         bool first_iteration = true;
         std::tm first_key{};
+        bool new_points = false;
         for(std::pair<std::tm, interval_t> pair : intervals){
             if(first_iteration){
                 first_key = pair.first;
@@ -46,7 +47,10 @@ public:
                 break;
 
             std::tm key = utility_t::tm_move_key(pair.first, x);
-            // Possible point of optimization: Skip any keys already present
+            if(points.contains(key)) {
+                i++;
+                continue;
+            }
 
             point_t point{};
             bool first_slice_loop = true;
@@ -78,6 +82,7 @@ public:
 
             point.calculate_so();
 
+            point.moving_avg = 0;
             if(i >= y) {
                 prev_key = utility_t::tm_move_key(key, -1);
                 int prev_closing_prices_added = 0;
@@ -90,13 +95,20 @@ public:
                 }
                 point.moving_avg = point.moving_avg / y;
             }
+            else
+                point.moving_avg = -1;
 
             points[key] = point;
+            new_points = true;
 
             i++;
         }
 
-        return points;
+        return new_points;
+    }
+
+    double get_opening_price_after(std::tm time){
+        return rc.get_opening_price_after(time);
     }
 
     stochastic_oscillator_t(const std::string& file_path) : rc{file_path}, points()

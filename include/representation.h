@@ -122,13 +122,24 @@ public:
     stock_t stock;
 
     std::map<std::tm, interval_t> get_period(const std::tm& start, const std::tm& end){
+        using namespace std::literals::string_literals;
         std::tm start_key = utility_t::tm_to_key(start);
         std::tm end_key = utility_t::tm_to_key(end);
 
-        while (!contains_interval(start_key, end_key) && get_data())
-            ;
+        while (!contains_interval(start_key, end_key))
+            if (!get_data())
+                throw std::logic_error("Read the entire document, did not find period"s);;
 
         return get_interval(start_key, end_key);
+    }
+
+    double get_opening_price_after(std::tm time){
+        std::tm next_time = utility_t::tm_move_key(time, 1);
+
+        while(!intervals.contains(next_time))
+            next_time = utility_t::tm_move_key(next_time, 1);
+
+        return intervals[next_time].first_price;
     }
 
     representation_candle_t(const std::string& file_path): sfr{file_path}, intervals(), pages_fetched()
