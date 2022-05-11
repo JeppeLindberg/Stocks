@@ -4,3 +4,7 @@ build-debug
 build-release
 cmake-build*
 .idea
+.aux
+.log
+.pdf
+.tex
