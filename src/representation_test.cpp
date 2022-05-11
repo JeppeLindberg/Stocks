@@ -20,5 +20,16 @@ TEST_CASE("representations")
         set_time("2012-08-06T01:00:00.000+0200"s, end);
 
         auto period = rc.get_period(start, end);
+
+        std::tm target = period.begin()->first;
+        CHECK(period[target].first_price == 53);
+        CHECK(period[target].last_price == 52);
+        CHECK(period[target].min_price == 52);
+        CHECK(period[target].max_price == 55);
+        target = utility_t::tm_move_key(target, 1);
+        CHECK(period[target].first_price == 52.5);
+        CHECK(period[target].last_price == 53);
+        CHECK(period[target].min_price == 51.5);
+        CHECK(period[target].max_price == 53);
     }
 }

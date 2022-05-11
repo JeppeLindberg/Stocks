@@ -95,6 +95,7 @@ struct utility_t{
 static void set_time(const std::string& time_str, std::tm& time){
     std::stringstream ss(time_str);
     ss >> std::get_time(&time, "%Y-%m-%dT%H:%M:%S.000+0100");
+    std::mktime(&time);
 }
 
 template<typename T>

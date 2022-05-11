@@ -2,7 +2,7 @@
 #include "doctest.h"
 #include "json.h"
 #include <sstream>
-#include <vector>
+#include <set>
 
 struct aggregate_t
 { /** public access is just for easy structured initialization in tests */
@@ -10,7 +10,7 @@ struct aggregate_t
     int x;
     double y;
     std::string z;
-    std::vector<int> w;
+    std::set<int> w;
 
     template <typename Visitor>
     void accept_writer(Visitor&& visit)
@@ -102,12 +102,12 @@ TEST_CASE("JSON input")
     SUBCASE("container")
     {
         auto is = std::istringstream{"[3,7,11]"};
-        auto v = std::vector<int>{};
+        auto v = std::set<int>{};
         auto amount = -1;
         auto offset = -1;
         is >> json_t{v, amount, offset};
         CHECK(is);
-        CHECK(v == std::vector{3, 7, 11});
+        CHECK(v == std::set{3, 7, 11});
     }
     SUBCASE("tuple")
     {

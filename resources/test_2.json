@@ -353,7 +353,7 @@
     },
     {
       "time": "2012-01-21T01:00:01.000+0100",
-      "price": 9,
+      "price": 1,
       "amount": 2,
       "buyer": "trade",
       "seller": "trade",
@@ -362,7 +362,124 @@
     },
     {
       "time": "2012-01-22T01:00:01.000+0100",
-      "price": 9,
+      "price": 1,
+      "amount": 2,
+      "buyer": "trade",
+      "seller": "trade",
+      "seq": 3,
+      "code": 4
+    },
+    {
+      "time": "2012-01-23T01:00:01.000+0100",
+      "price": 2,
+      "amount": 2,
+      "buyer": "trade",
+      "seller": "trade",
+      "seq": 3,
+      "code": 4
+    },
+    {
+      "time": "2012-01-24T01:00:01.000+0100",
+      "price": 7,
+      "amount": 2,
+      "buyer": "trade",
+      "seller": "trade",
+      "seq": 3,
+      "code": 4
+    },
+    {
+      "time": "2012-01-25T01:00:01.000+0100",
+      "price": 6,
+      "amount": 2,
+      "buyer": "trade",
+      "seller": "trade",
+      "seq": 3,
+      "code": 4
+    },
+    {
+      "time": "2012-01-26T01:00:01.000+0100",
+      "price": 5,
+      "amount": 2,
+      "buyer": "trade",
+      "seller": "trade",
+      "seq": 3,
+      "code": 4
+    },
+    {
+      "time": "2012-01-27T01:00:01.000+0100",
+      "price": 4,
+      "amount": 2,
+      "buyer": "trade",
+      "seller": "trade",
+      "seq": 3,
+      "code": 4
+    },
+    {
+      "time": "2012-01-28T01:00:01.000+0100",
+      "price": 10,
+      "amount": 2,
+      "buyer": "trade",
+      "seller": "trade",
+      "seq": 3,
+      "code": 4
+    },
+    {
+      "time": "2012-01-29T01:00:01.000+0100",
+      "price": 20,
+      "amount": 2,
+      "buyer": "trade",
+      "seller": "trade",
+      "seq": 3,
+      "code": 4
+    },
+    {
+      "time": "2012-01-30T01:00:01.000+0100",
+      "price": 21,
+      "amount": 2,
+      "buyer": "trade",
+      "seller": "trade",
+      "seq": 3,
+      "code": 4
+    },
+    {
+      "time": "2012-01-31T01:00:01.000+0100",
+      "price": 22,
+      "amount": 2,
+      "buyer": "trade",
+      "seller": "trade",
+      "seq": 3,
+      "code": 4
+    },
+    {
+      "time": "2012-02-01T01:00:01.000+0100",
+      "price": 15,
+      "amount": 2,
+      "buyer": "trade",
+      "seller": "trade",
+      "seq": 3,
+      "code": 4
+    },
+    {
+      "time": "2012-02-02T01:00:01.000+0100",
+      "price": 14,
+      "amount": 2,
+      "buyer": "trade",
+      "seller": "trade",
+      "seq": 3,
+      "code": 4
+    },
+    {
+      "time": "2012-02-03T01:00:01.000+0100",
+      "price": 13,
+      "amount": 2,
+      "buyer": "trade",
+      "seller": "trade",
+      "seq": 3,
+      "code": 4
+    },
+    {
+      "time": "2012-02-04T01:00:01.000+0100",
+      "price": 12,
       "amount": 2,
       "buyer": "trade",
       "seller": "trade",
