@@ -35,7 +35,7 @@ struct trade_t
         visit("seq", seq);
         visit("code", code);
 
-        utility_t::set_time(time_str, time);
+        set_time(time_str, time);
     }
 
     friend bool operator==(const trade_t& t1, const trade_t& t2)
@@ -84,7 +84,7 @@ struct trade_t
             std::string _buyer, std::string _seller, int _seq, int _code):
             time(), price(_price), amount(_amount), buyer(_buyer), seller(_seller),
             seq(_seq), code(_code){
-        utility_t::set_time(_time, time);
+        set_time(_time, time);
     }
 };
 

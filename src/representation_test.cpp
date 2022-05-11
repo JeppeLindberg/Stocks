@@ -16,8 +16,8 @@ TEST_CASE("representations")
 
         std::tm start{};
         std::tm end{};
-        utility_t::set_time("2012-08-02T01:00:00.000+0200"s, start);
-        utility_t::set_time("2012-08-06T01:00:00.000+0200"s, end);
+        set_time("2012-08-02T01:00:00.000+0200"s, start);
+        set_time("2012-08-06T01:00:00.000+0200"s, end);
 
         auto period = rc.get_period(start, end);
     }

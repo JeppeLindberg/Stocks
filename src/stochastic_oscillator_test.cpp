@@ -15,13 +15,14 @@ TEST_CASE("stochastic_oscillator")
 
         std::tm start{};
         std::tm end{};
-        utility_t::set_time("2012-01-02T01:00:01.000+0100"s, start);
-        utility_t::set_time("2012-01-21T01:00:01.000+0100"s, end);
+        set_time("2012-01-02T01:00:01.000+0100"s, start);
+        set_time("2012-01-21T01:00:01.000+0100"s, end);
 
-        auto points = so.get_period(start, end);
+        so.get_period(start, end);
+        auto points = so.points;
 
         std::tm target{};
-        utility_t::set_time("2012-01-16T01:00:01.000+0100"s, target);
+        set_time("2012-01-16T01:00:01.000+0100"s, target);
         target = utility_t::tm_to_key(target);
 
         CHECK(points[target].lowest_overall == 1);
@@ -45,8 +46,8 @@ TEST_CASE("stochastic_oscillator")
 
         std::tm start{};
         std::tm end{};
-        utility_t::set_time("2011-00-01T01:00:00.000+0200"s, start);
-        utility_t::set_time("2012-00-01T01:00:00.000+0200"s, end);
+        set_time("2011-00-01T01:00:00.000+0200"s, start);
+        set_time("2012-00-01T01:00:00.000+0200"s, end);
 
         auto points = so.get_period(start, end);
     }*/

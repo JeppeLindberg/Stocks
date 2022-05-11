@@ -90,12 +90,12 @@ struct utility_t{
         std::mktime(&time);
         return time;
     }
-
-    static void set_time(const std::string& time_str, std::tm& time){
-        std::istringstream ss(time_str);
-        ss >> std::get_time(&time, "%Y-%m-%dT%H:%M:%S.000+0100");
-    }
 };
+
+static void set_time(const std::string& time_str, std::tm& time){
+    std::stringstream ss(time_str);
+    ss >> std::get_time(&time, "%Y-%m-%dT%H:%M:%S.000+0100");
+}
 
 template<typename T>
 constexpr auto slice(T&& container, int from, int to)
