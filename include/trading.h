@@ -10,6 +10,31 @@ enum Action{
     sell = 2,
 };
 
+struct trading_strategies_t{
+    const std::function<Action(point_t)> strategy_1 = [](point_t point)
+    {
+        if(point.moving_avg < 0.4 &&
+           point.so > 0.4 &&
+           std::abs(point.so - point.moving_avg) > 0.02)
+            return Action{buy};
+        if(point.moving_avg > 0.6 &&
+           point.so < 0.6)
+            return Action{sell};
+        return Action{do_nothing};
+    };
+    const std::function<Action(point_t)> strategy_2 = [](point_t point)
+    {
+        if(point.moving_avg < 0.2 &&
+           point.so > 0.2 &&
+           std::abs(point.so - point.moving_avg) > 0.02)
+            return Action{buy};
+        if(point.moving_avg > 0.6 &&
+           point.so < 0.6)
+            return Action{sell};
+        return Action{do_nothing};
+    };
+};
+
 // Requirement 5, requirement 6
 class trading_t{
     std::tm begin_time;
@@ -17,7 +42,7 @@ class trading_t{
     void buy_stock(const std::tm& time){
         double price = so.get_opening_price_after(time);
         if(money > 0)
-            std::cout << "Buy at " << price << " (" << time << ")" << std::endl;
+            sstream << "Buy at " << price << " (" << time << ")\n";
         shares += money/price;
         money = 0;
     }
@@ -25,16 +50,16 @@ class trading_t{
     void sell_stock(const std::tm& time){
         double price = so.get_opening_price_after(time);
         if(shares > 0)
-            std::cout << "Sell at " << price << " (" << time << ")" << std::endl;
+            sstream << "Sell at " << price << " (" << time << ")\n";
         money += shares*price;
         shares = 0;
     }
 
 public:
-    std::map<std::tm, point_t> points;
     stochastic_oscillator_t so;
     std::tm current_time;
     std::function<Action(point_t)> trade_strategy;
+    std::stringstream sstream;
 
     double money = 10000;
     double shares = 0;
@@ -67,11 +92,13 @@ public:
         sell_stock(so.points.rbegin()->first);
     }
 
-    trading_t(const std::string &file_path, std::tm _time): so(file_path),
-                current_time(utility_t::tm_to_key(_time)), points(points)
-    {
-        points = std::map<std::tm, point_t>{};
+    std::string result_as_string() {
+        return sstream.str();
     }
+
+    trading_t(const std::string &file_path, std::tm _time): so(file_path),
+                current_time(utility_t::tm_to_key(_time)), sstream{}
+    {}
 };
 
 #endif //STOCKS_TRADING_H

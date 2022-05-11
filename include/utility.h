@@ -72,7 +72,7 @@ std::ostream& operator<<(std::ostream& os, const std::tm& time) {
 
 struct utility_t{
     constexpr static std::tm min_tm{0,0,0,0,0,0,0,0,0};
-    constexpr static std::tm max_tm{0,0,0,0,0,999,0,0,0};
+    constexpr static std::tm max_tm{0,0,0,0,0,9999,0,0,0};
     constexpr static int hpc = 24; // Hours per candle
 
     static std::tm tm_to_key(std::tm time){
@@ -118,6 +118,23 @@ constexpr std::map<std::tm, T> slice(std::map<std::tm, T>& map, std::tm from, st
     }
 
     return ret_map;
+}
+
+template<typename T>
+constexpr bool contains_slice(std::map<std::tm, T>& map, const std::tm& from, const std::tm& to)
+{
+    bool contains_lower = false;
+    bool contains_higher = false;
+
+    for(const std::pair<std::tm, T>& pair : map){
+        if(!contains_lower && pair.first <= from)
+            contains_lower = true;
+        if(!contains_higher && to <= pair.first)
+            contains_higher = true;
+        if(contains_lower && contains_higher)
+            return true;
+    }
+    return false;
 }
 
 #endif //STOCKS_UTILITY_H

@@ -40,25 +40,10 @@ class representation_candle_t{
     std::map<std::tm, interval_t> intervals;
     std::vector<int> pages_fetched;
 
-    bool contains_interval(const std::tm& start, const std::tm& end){
-        bool contains_lower = false;
-        bool contains_higher = false;
-
-        for(std::pair<std::tm, interval_t> pair : intervals){
-            if(!contains_lower && pair.first <= start)
-                contains_lower = true;
-            if(!contains_higher && end <= pair.first)
-                contains_higher = true;
-            if(contains_lower && contains_higher)
-                return true;
-        }
-        return false;
-    }
-
     std::map<std::tm, interval_t> get_interval(const std::tm& start, const std::tm& end){
         using namespace std::literals::string_literals;
 
-        if (!contains_interval(start, end))
+        if (!contains_slice(intervals, start, end))
             throw std::logic_error("Period not in range"s);
 
         std::tm lower_key = utility_t::min_tm;
@@ -126,7 +111,7 @@ public:
         std::tm start_key = utility_t::tm_to_key(start);
         std::tm end_key = utility_t::tm_to_key(end);
 
-        while (!contains_interval(start_key, end_key))
+        while (!contains_slice(intervals, start_key, end_key))
             if (!get_data())
                 throw std::logic_error("Read the entire document, did not find period"s);;
 

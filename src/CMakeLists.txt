@@ -15,7 +15,11 @@ target_link_libraries(stochastic_oscillator_test PRIVATE doctest)
 add_executable(trading_test trading_test.cpp)
 target_link_libraries(trading_test PRIVATE doctest)
 
+add_executable(concurrent_trading_test concurrent_trading_test.cpp)
+target_link_libraries(concurrent_trading_test PRIVATE doctest)
+
 add_test(NAME json_test COMMAND json_test)
 add_test(NAME file_reader_test COMMAND file_reader_test)
 add_test(NAME stochastic_oscillator_test COMMAND stochastic_oscillator_test)
 add_test(NAME trading_test COMMAND trading_test)
+add_test(NAME concurrent_trading_test COMMAND concurrent_trading_test)
