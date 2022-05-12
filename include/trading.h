@@ -77,6 +77,7 @@ public:
             i++;
             if(!so.get_period(begin_time, current_time))
                 continue;
+            // Possible point of optimization: Calculate all periods first, before simulating trades
 
             auto new_point = *so.points.rbegin();
             if (new_point.second.moving_avg == -1)
