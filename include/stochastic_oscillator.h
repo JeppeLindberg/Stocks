@@ -30,14 +30,14 @@ public:
     int y = 3;
 
     bool get_period(const std::tm& start, const std::tm& end){
-        std::map<std::tm, interval_t> intervals = rc.get_period(start, end);
+        std::map<std::tm, std::shared_ptr<interval_t>> intervals = rc.get_period(start, end);
 
         int intervals_size = intervals.size();
         int i = 0;
         bool first_iteration = true;
         std::tm first_key{};
         bool new_points = false;
-        for(std::pair<std::tm, interval_t> pair : intervals){
+        for(std::pair<std::tm, std::shared_ptr<interval_t>> pair : intervals){
             if(first_iteration){
                 first_key = pair.first;
                 first_iteration = false;
@@ -55,25 +55,25 @@ public:
             point_t point{};
             bool first_slice_loop = true;
             // Finds the span of x intervals for calculating lowest_overall and highest_overall
-            auto slc = slice(intervals, utility_t::tm_move_key(key, -x), key);
-            for(std::pair<std::tm, interval_t> pair_prev : slc){
+            auto slc = slice(rc.intervals, utility_t::tm_move_key(key, -x), key);
+            for(std::pair<std::tm, std::shared_ptr<interval_t>> pair_prev : slc){
                 if(first_slice_loop){
-                    point.lowest_overall = pair_prev.second.min_price;
-                    point.highest_overall = pair_prev.second.max_price;
+                    point.lowest_overall = pair_prev.second->min_price;
+                    point.highest_overall = pair_prev.second->max_price;
                     first_slice_loop = false;
                 }
                 else {
-                    if (pair_prev.second.min_price < point.lowest_overall)
-                        point.lowest_overall = pair_prev.second.min_price;
-                    if (point.highest_overall < pair_prev.second.max_price)
-                        point.highest_overall = pair_prev.second.max_price;
+                    if (pair_prev.second->min_price < point.lowest_overall)
+                        point.lowest_overall = pair_prev.second->min_price;
+                    if (point.highest_overall < pair_prev.second->max_price)
+                        point.highest_overall = pair_prev.second->max_price;
                 }
             }
 
             std::tm prev_key = utility_t::tm_move_key(key, -1);
             while (prev_key != first_key) {
                 if (intervals.contains(prev_key)) {
-                    point.closing_price = intervals[prev_key].last_price;
+                    point.closing_price = intervals.at(prev_key)->last_price;
                     break;
                 }
                 else

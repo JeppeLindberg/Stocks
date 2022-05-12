@@ -5,6 +5,8 @@
 #include <fstream>
 #include <ctime>
 #include <map>
+#include <iterator>
+#include <memory>
 
 bool operator==(const std::tm& t1, const std::tm& t2)
 {
@@ -105,16 +107,17 @@ constexpr auto slice(T&& container, int from, int to)
 }
 
 template<typename T>
-constexpr std::map<std::tm, T> slice(std::map<std::tm, T>& map, std::tm from, std::tm to)
+constexpr std::map<std::tm, std::shared_ptr<T>> slice(std::map<std::tm, T>& map, const std::tm& from, const std::tm& to)
 {
     // Possible point of optimization: Prevent the slice from being copies, and instead make them references
 
     std::tm key = from;
-    std::map<std::tm, T> ret_map;
+    std::map<std::tm, std::shared_ptr<T>> ret_map;
 
     while(key < to){
-        if (map.contains(key))
-            ret_map[key] = map[key];
+        if (map.contains(key)) {
+            ret_map[key] = std::shared_ptr<T>{&map.at(key)};
+        }
         key = utility_t::tm_move_key(key, 1);
     }
 

@@ -46,10 +46,9 @@ struct interval_t{
 // Requirement 3
 class representation_candle_t{
     stock_file_reader_t sfr;
-    std::map<std::tm, interval_t> intervals;
     std::vector<int> pages_fetched;
 
-    std::map<std::tm, interval_t> get_interval(const std::tm& start, const std::tm& end){
+    std::map<std::tm, std::shared_ptr<interval_t>> get_interval(const std::tm& start, const std::tm& end){
         using namespace std::literals::string_literals;
 
         if (!contains_slice(intervals, start, end))
@@ -113,9 +112,10 @@ class representation_candle_t{
     }
 
 public:
+    std::map<std::tm, interval_t> intervals;
     stock_t stock;
 
-    std::map<std::tm, interval_t> get_period(const std::tm& start, const std::tm& end){
+    std::map<std::tm, std::shared_ptr<interval_t>> get_period(const std::tm& start, const std::tm& end){
         using namespace std::literals::string_literals;
         std::tm start_key = utility_t::tm_to_key(start);
         std::tm end_key = utility_t::tm_to_key(end);
@@ -139,12 +139,12 @@ public:
 
         QStringList categories;
 
-        for(std::pair<std::tm, interval_t> pair: period){
+        for(std::pair<std::tm, std::shared_ptr<interval_t>> pair: period){
             auto *set = new QtCharts::QCandlestickSet(mktime(&pair.first));
-            set->setOpen(pair.second.first_price);
-            set->setHigh(pair.second.max_price);
-            set->setLow(pair.second.min_price);
-            set->setClose(pair.second.last_price);
+            set->setOpen(pair.second->first_price);
+            set->setHigh(pair.second->max_price);
+            set->setLow(pair.second->min_price);
+            set->setClose(pair.second->last_price);
             candle_plot->append(set);
             //categories << QDateTime::fromTime_t(mktime(&pair.first)).toString();
         }
