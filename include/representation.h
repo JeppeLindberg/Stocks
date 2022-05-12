@@ -8,6 +8,15 @@
 #include <limits>
 #include <map>
 
+#include <QtCharts/QCandlestickSeries>
+#include <QtCharts/QCandlestickSet>
+#include <QtCharts/QChartView>
+#include <QtCharts/QBarCategoryAxis>
+#include <QtCharts/QValueAxis>
+#include <QtCharts/QChart>
+#include <QtCore/QDateTime>
+#include <QtWidgets/QMainWindow>
+
 struct interval_t{
     std::set<trade_t> trades;
     double first_price;
@@ -116,6 +125,55 @@ public:
                 throw std::logic_error("Read the entire document, did not find period"s);;
 
         return get_interval(start_key, end_key);
+    }
+
+    // Requirement 10
+    void plot_period(const std::tm& start, const std::tm& end){
+        // Attempted to implement this, got an access violation exception that I could not fix (0xC0000005)
+        auto period = get_period(start, end);
+
+        auto candle_plot = new QtCharts::QCandlestickSeries{};
+        candle_plot->setName("Candle Stick");
+        candle_plot->setIncreasingColor(QColor(Qt::green));
+        candle_plot->setIncreasingColor(QColor(Qt::red));
+
+        QStringList categories;
+
+        for(std::pair<std::tm, interval_t> pair: period){
+            auto *set = new QtCharts::QCandlestickSet(mktime(&pair.first));
+            set->setOpen(pair.second.first_price);
+            set->setHigh(pair.second.max_price);
+            set->setLow(pair.second.min_price);
+            set->setClose(pair.second.last_price);
+            candle_plot->append(set);
+            //categories << QDateTime::fromTime_t(mktime(&pair.first)).toString();
+        }
+
+        QtCharts::QChart chart{};
+        auto *chart_ptr = &chart;
+        chart_ptr->addSeries(candle_plot);
+        chart_ptr->setTitle("Candle stick title");
+        chart_ptr->setAnimationOptions(QtCharts::QChart::SeriesAnimations);
+
+        chart_ptr->createDefaultAxes();
+
+        auto *axisX = qobject_cast<QtCharts::QBarCategoryAxis *>(chart_ptr->axes(Qt::Horizontal).at(0));
+        axisX->setCategories(categories);
+
+        auto *axisY = qobject_cast<QtCharts::QValueAxis *>(chart_ptr->axes(Qt::Vertical).at(0));
+        axisY->setMax(axisY->max() * 1.01);
+        axisY->setMin(axisY->min() * 0.99);
+
+        chart_ptr->legend()->setVisible(true);
+        chart_ptr->legend()->setAlignment(Qt::AlignBottom);
+
+        auto *chartView = new QtCharts::QChartView(chart_ptr);
+        chartView->setRenderHint(QPainter::Antialiasing);
+
+        QMainWindow window;
+        window.setCentralWidget(chartView);
+        window.resize(800, 600);
+        window.show();
     }
 
     double get_opening_price_after(std::tm time){

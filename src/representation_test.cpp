@@ -32,4 +32,17 @@ TEST_CASE("representations")
         CHECK(period[target].min_price == 51.5);
         CHECK(period[target].max_price == 53);
     }
+
+    /*SUBCASE("candle plot JYSK")
+    {
+        using namespace std::literals::string_literals;
+        representation_candle_t rc(sample_dir + "JYSK.json");
+
+        std::tm start{};
+        std::tm end{};
+        set_time("2011-10-01T01:00:00.000+0200"s, start);
+        set_time("2012-10-01T01:00:00.000+0200"s, end);
+
+        rc.plot_period(start, end);
+    }*/
 }

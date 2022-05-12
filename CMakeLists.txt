@@ -38,10 +38,19 @@ if (ASAN)
     endif()
 endif()
 
-
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
 endif(NOT CMAKE_BUILD_TYPE)
+
+find_package(Qt5 COMPONENTS Widgets Charts Core QUIET)
+if (Qt5_FOUND)
+    message(STATUS "Qt5 found, fantastic!")
+    set(CMAKE_AUTOMOC ON)
+    set(CMAKE_AUTORCC ON)
+    set(CMAKE_AUTOUIC ON)
+else(Qt5_FOUND)
+    message(WARNING "Qt5 NOT found, test_qt5 will be disabled. Please install qt5charts development package.")
+endif(Qt5_FOUND)
 
 include_directories(include)
 include_directories(resources)

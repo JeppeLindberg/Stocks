@@ -3,6 +3,7 @@
 
 #include <functional>
 #include "stochastic_oscillator.h"
+#include "benchmark.h"
 
 enum Action{
     do_nothing = 0,
@@ -63,8 +64,11 @@ public:
 
     double money = 10000;
     double shares = 0;
+    bool benchmark = false;
 
     void simulate_trades(int duration_days) {
+        benchmark_t b{};
+
         begin_time = utility_t::tm_move_key(current_time, -20);
         int i = 0;
         while (i<duration_days){
@@ -90,6 +94,9 @@ public:
             }
         }
         sell_stock(so.points.rbegin()->first);
+
+        if (benchmark)
+            std::cout << "trading_t.simulate_trades() benchmark: " << b.get_time() << " ms" << std::endl;
     }
 
     std::string result_as_string() {
