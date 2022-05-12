@@ -39,7 +39,7 @@ TEST_CASE("stochastic_oscillator")
         CHECK(points[target].highest_overall == 10);
     }
 
-    /*SUBCASE("stochastic BAVA")
+    SUBCASE("stochastic BAVA")
     {
         using namespace std::literals::string_literals;
         stochastic_oscillator_t so(sample_dir + "BAVA.json");
@@ -50,5 +50,5 @@ TEST_CASE("stochastic_oscillator")
         set_time("2012-00-01T01:00:00.000+0200"s, end);
 
         auto points = so.get_period(start, end);
-    }*/
+    }
 }

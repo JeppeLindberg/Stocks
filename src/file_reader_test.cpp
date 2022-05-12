@@ -169,16 +169,5 @@ TEST_CASE("read file")
                                                3,
                                                4}}});
     }
-
-
-    /*SUBCASE("read sample")
-    {
-        stock_file_reader_t fr(sample_dir + "DSV.json");
-
-        auto stock = fr.read_trades(1000, 30000);
-
-        std::cout << stock << std::endl;
-    }*/
-
 }
 

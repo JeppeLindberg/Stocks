@@ -8,7 +8,7 @@ TEST_CASE("trading test")
     auto sample_dir = "C://Users//Jeppe//Downloads//SPexam_sample_input_data//json-2y//"s;
     trading_strategies_t ts{};
 
-    /*SUBCASE("trading test_2")
+    SUBCASE("trading test_2")
     {
         using namespace std::literals::string_literals;
         std::tm start{};
@@ -20,9 +20,9 @@ TEST_CASE("trading test")
         trading.simulate_trades(11);
         CHECK(trading.result_as_string() == "Buy at 4 (2012-1-26T0:0:0)\nSell at 14 (2012-2-1T0:0:0)\n");
         CHECK(trading.money == 35000);
-    }*/
+    }
 
-    /*SUBCASE("trading JYSK")
+    SUBCASE("trading JYSK")
     {
         using namespace std::literals::string_literals;
         std::tm start{};
@@ -34,7 +34,7 @@ TEST_CASE("trading test")
         trading.simulate_trades(365);
         std::cout << trading.result_as_string() << std::endl;
         std::cout << trading.money << std::endl;
-    }*/
+    }
 
     SUBCASE("trading JYSK benchmark")
     {
@@ -49,7 +49,7 @@ TEST_CASE("trading test")
         trading.simulate_trades(365);
     }
 
-    /*SUBCASE("trading test_2 lambda")
+    SUBCASE("trading test_2 lambda")
     {
         using namespace std::literals::string_literals;
         std::tm start{};
@@ -72,8 +72,7 @@ TEST_CASE("trading test")
         CHECK(trading.result_as_string() == "Buy at 4 (2012-1-26T0:0:0)\nSell at 14 (2012-2-1T0:0:0)\n");
         CHECK(trading.money == 35000);
     }
-
-
+    
     SUBCASE("trading GEN")
     {
         using namespace std::literals::string_literals;
@@ -86,5 +85,5 @@ TEST_CASE("trading test")
         trading.simulate_trades(365);
         std::cout << trading.result_as_string() << std::endl;
         std::cout << trading.money << std::endl;
-    }*/
+    }
 }
